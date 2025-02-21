@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Seznam delovnih nalogov</h2>
+<div>
+  <a class="btn btn-success" href="{{ url_for('dodaj_delovni_nalog') }}">Dodaj nov delovni nalog</a>
+</div>
+
+{% if glave %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Naslov</th>
+        <th>Projekt</th>
+        <th>Status</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for glava in glave %}
+      <tr>
+        <td>{{ glava.idGlava_delovnega_naloga }}</td>
+        <td>{{ glava.naslovDN }}</td>
+        <td>{{ glava.projekt.naziv_projekta if glava.projekt else '' }}</td>
+        <td>{{ glava.status }}</td>
+        <td>
+          <a class="btn" 
+             href="{{ url_for('uredi_status', id_glave=glava.idGlava_delovnega_naloga) }}">
+             Uredi status
+          </a>
+          <a class="btn btn-success"
+             href="{{ url_for('podrobnosti_delovnega_naloga', id_glave=glava.idGlava_delovnega_naloga) }}">
+             Podrobnosti
+          </a>
+          <!-- NOV gumb: Izvoz PDF -->
+          <a class="btn" 
+            href="{{ url_for('izvoz_pdf', id_glave=glava.idGlava_delovnega_naloga) }}">
+            Izvozi PDF
+            </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Trenutno ni nobenih delovnih nalogov.</p>
+{% endif %}
+
+
+{% endblock %}

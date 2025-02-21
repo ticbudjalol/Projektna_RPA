@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Uredi Status Delovnega Naloga: {{ glava.naslovDN }}</h2>
+
+<form method="POST">
+  <label for="status">Status:</label>
+  <select id="status" name="status">
+    {% for s in statusi %}
+      <option value="{{ s }}" {% if s == glava.status %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit" class="btn">Posodobi Status</button>
+  <a href="{{ url_for('podrobnosti_delovnega_naloga', id_glave=glava.idGlava_delovnega_naloga) }}" class="btn btn-secondary">Prekliči</a>
+</form>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF predloga</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>Delovni Nalog - {{ glava.naslovDN }}</h1>
+  <p><strong>ID:</strong> {{ glava.idGlava_delovnega_naloga }}</p>
+  <p><strong>Projekt:</strong> {{ glava.projekt.naziv_projekta if glava.projekt else '' }}</p>
+  <p><strong>Status:</strong> {{ glava.status }}</p>
+  <hr>
+
+  <h2>Postavke</h2>
+  {% if glava.postavke %}
+  <table>
+    <thead>
+      <tr>
+        <th>Ident</th>
+        <th>Količina</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in glava.postavke %}
+      <tr>
+        <td>{{ p.ident.naziv if p.ident else '' }}</td>
+        <td>{{ p.kolicina }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Ni postavk.</p>
+  {% endif %}
+</body>
+</html>

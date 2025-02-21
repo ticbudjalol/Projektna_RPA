@@ -1,0 +1,256 @@
+/* ========== OSNOVNI SLOGI ========== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+header, footer {
+background-color: #2c3e50;
+color: #ecf0f1;
+padding: 0.5rem 1rem;
+}
+
+.container {
+max-width: 900px;
+margin: 1rem auto;
+padding: 1rem;
+background-color: #ffffff;
+box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+/* ========== NAVIGACIJA ========== */
+.navbar {
+background: #333;
+color: #fff;
+display: flex;
+justify-content: space-between; 
+align-items: center;
+padding: 0.5rem 1rem;
+}
+
+/* Levo območje: Brand, ipd. */
+.nav-left .brand {
+color: #fff;
+text-decoration: none;
+font-size: 1.2rem;
+font-weight: bold;
+}
+
+/* Desno območje: hamburger + meni */
+.nav-right {
+position: relative;
+}
+
+/* Gumb z ikono “bars” */
+.toggle-btn {
+background: none;
+border: none;
+color: #fff;
+font-size: 1.5rem;
+display: none; /* skrito na večjih zaslonih */
+cursor: pointer;
+}
+
+/* Meni sam */
+.nav-menu {
+display: flex;  /* vodoravna vrstica za desktop */
+gap: 1rem;
+}
+
+/* Povezave */
+.nav-menu a {
+color: #fff;
+text-decoration: none;
+font-weight: 500;
+}
+
+.nav-menu a:hover {
+text-decoration: underline;
+}
+
+/* Manjši zasloni: nav-menu privzeto skrit, hamburger prikazan */
+@media (max-width: 768px) {
+.nav-menu {
+  display: none;
+  position: absolute; 
+  top: 3rem;
+  right: 1rem;
+  background-color: #444;
+  padding: 1rem;
+  flex-direction: column;
+  border-radius: 4px;
+}
+.nav-menu.open {
+  display: flex;  /* prikaže se */
+}
+
+.toggle-btn {
+  display: inline; /* hamburger gumb viden */
+}
+}
+
+/* ========== FLASH MESSAGES ========== */
+.flash-messages {
+margin-bottom: 1rem;
+}
+.flash-msg {
+background-color: #f1c40f;
+padding: 0.5rem;
+margin-bottom: 0.3rem;
+border-radius: 4px;
+}
+
+/* ========== TABELA ========== */
+table {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 1rem;
+background-color: #fff;
+}
+table thead {
+background-color: #34495e;
+color: #ecf0f1;
+}
+table th, table td {
+padding: 0.75rem;
+border: 1px solid #ccc;
+}
+table tr:nth-child(even) {
+background-color: #f8f8f8;
+}
+
+/* ========== GUMBI ========== */
+.btn {
+display: inline-block;
+padding: 0.4rem 0.8rem;
+margin: 0.2rem 0;
+border: none;
+border-radius: 4px;
+text-decoration: none;
+cursor: pointer;
+font-size: 0.95rem;
+color: #fff;
+background-color: #3498db;
+}
+.btn:hover {
+background-color: #2980b9;
+}
+
+.btn-secondary {
+background-color: #7f8c8d;
+}
+.btn-secondary:hover {
+background-color: #636e72;
+}
+
+.btn-success {
+background-color: #27ae60;
+}
+.btn-success:hover {
+background-color: #229954;
+}
+
+.btn-warning {
+background-color: #f39c12;
+}
+.btn-warning:hover {
+background-color: #d68910;
+}
+
+.btn-danger {
+background-color: #c0392b;
+}
+.btn-danger:hover {
+background-color: #992d22;
+}
+
+/* ========== FORM ========== */
+form {
+margin-bottom: 1rem;
+}
+label {
+display: block;
+margin-top: 0.5rem;
+}
+input[type="text"],
+input[type="password"],
+input[type="number"],
+select {
+width: 100%;
+padding: 0.4rem;
+margin-top: 0.2rem;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
+
+/* ========== FOOTER ========== */
+footer {
+text-align: center;
+}
+footer p {
+margin: 0.5rem;
+}
+
+/* PRIMER: .menu-grid za mobilno prilagodljiv meni */
+.menu-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+gap: 1rem;
+margin-top: 2rem;
+text-align: center;
+}
+
+/* Na zelo ozkih zaslonih (max-width: 400px) ... */
+@media (max-width: 400px) {
+.menu-grid {
+  grid-template-columns: 1fr; /* vse v en stolpec */
+}
+}
+
+/* ========== DROPDOWN ========== */
+.dropdown {
+position: relative;
+display: inline-block;
+}
+
+/* Gumb/titel v dropdownu */
+.dropdown-title {
+/* Malo odmaknemo ikono od teksta */
+display: flex;
+align-items: center;
+gap: 0.3rem;
+}
+
+/* Dropdown vsebina je privzeto skrita */
+.dropdown-content {
+display: none;
+position: absolute;
+top: 100%; /* Takoj pod 'Moj profil' */
+left: 0;
+background-color: #444;
+min-width: 150px;
+padding: 0.5rem 0; /* odstranjena margin-top in dodan padding */
+border-radius: 4px;
+z-index: 10;
+}
+
+/* Linki znotraj dropdowna */
+.dropdown-content a {
+display: block; /* da je vsak link v svoji vrstici */
+padding: 0.5rem 1rem;
+color: #fff;
+text-decoration: none;
+}
+.dropdown-content a:hover {
+background-color: #333;
+}
+
+/* Na širših zaslonih: ob hover prikažemo vsebino */
+@media (min-width: 769px) {
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dodaj Postavko v Delovni Nalog: {{ glava.naslovDN }}</h2>
+
+<form method="POST">
+  <label for="ident_id">Izberi ident:</label>
+  <select id="ident_id" name="ident_id" required>
+    <option value="" disabled selected>-- izberi ident --</option>
+    {% for ident in identi %}
+      <option value="{{ ident.id }}">{{ ident.naziv }} ({{ ident.merska_enota }})</option>
+    {% endfor %}
+  </select>
+
+  <label for="kolicina">Količina:</label>
+  <input type="number" id="kolicina" name="kolicina" value="1" min="1">
+
+  <button type="submit" class="btn btn-success">Dodaj postavko</button>
+  <a href="{{ url_for('index') }}" class="btn btn-secondary">Nazaj</a>
+</form>
+{% endblock %}

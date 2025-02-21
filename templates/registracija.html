@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Registracija Navadnega Uporabnika</h2>
+<form method="POST">
+  <label for="username">Uporabniško ime:</label>
+  <input type="text" name="username" required>
+
+  <label for="password">Geslo:</label>
+  <input type="password" name="password" required>
+
+  <label for="company_key">Ključ podjetja:</label>
+  <input type="text" name="company_key" required>
+
+  <button type="submit" class="btn btn-success">Registriraj me</button>
+</form>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  referrerpolicy="no-referrer"
+/>
+
+<style>
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+  .menu-item {
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 1rem;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.2s;
+  }
+  .menu-item:hover {
+    background-color: #e2e2e2;
+  }
+  .menu-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: #3498db;
+  }
+  .menu-text {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+</style>
+
+<h2>Dobrodošli!</h2>
+<p>Izberi eno izmed spodnjih možnosti:</p>
+
+<div class="menu-grid">
+
+  <a href="{{ url_for('seznam_projektov') }}" class="menu-item">
+    <i class="fas fa-briefcase menu-icon"></i>
+    <div class="menu-text">Seznam projektov</div>
+  </a>
+
+  <a href="{{ url_for('seznam_delovnih_nalogov') }}" class="menu-item">
+    <i class="fas fa-tasks menu-icon"></i>
+    <div class="menu-text">Seznam delovnih nalogov</div>
+  </a>
+
+  <a href="{{ url_for('seznam_identov') }}" class="menu-item">
+    <i class="fas fa-cubes menu-icon"></i>
+    <div class="menu-text">Seznam identov</div>
+  </a>
+
+  {% if current_user.role == 'admin' %}
+  <a href="{{ url_for('admin_meni') }}" class="menu-item">
+    <i class="fas fa-user-shield menu-icon"></i>
+    <div class="menu-text">Admin meni</div>
+  </a>
+  {% endif %}
+
+</div>
+{% endblock %}

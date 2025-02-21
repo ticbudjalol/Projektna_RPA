@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Potrditev 2FA</h2>
+<form method="POST">
+  <label for="code">Vnesite 6-mestno kodo iz Google Authenticator:</label><br>
+  <input type="text" name="code" id="code" required>
+  <button type="submit" class="btn btn-primary">Potrdi</button>
+</form>
+{% endblock %}

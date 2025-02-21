@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Seznam identov</h2>
+
+{% if identi %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Naziv</th>
+        <th>Merska enota</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in identi %}
+      <tr>
+        <td>{{ i.id }}</td>
+        <td>{{ i.naziv }}</td>
+        <td>{{ i.merska_enota }}</td>
+        <td>
+          <a class="btn btn-sm btn-warning"
+             href="{{ url_for('uredi_ident', id_ident=i.id) }}">
+             Uredi
+          </a>
+          <form action="{{ url_for('izbrisi_ident', id_ident=i.id) }}" 
+                method="POST" style="display:inline;">
+            <button class="btn btn-sm btn-danger"
+                    type="submit"
+                    onclick="return confirm('Res želite izbrisati ident {{ i.naziv }}?')">
+              Izbriši
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Trenutno ni identov.</p>
+{% endif %}
+
+<a class="btn btn-success" href="{{ url_for('dodaj_ident') }}">Dodaj nov ident</a>
+{% endblock %}

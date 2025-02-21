@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Uredi Projekt: {{ projekt.naziv_projekta }}</h2>
+<form method="POST">
+  <label for="naziv_projekta">Naziv projekta:</label>
+  <input type="text" name="naziv_projekta" id="naziv_projekta"
+         value="{{ projekt.naziv_projekta }}" required>
+
+  <label for="narocnik">Naročnik:</label>
+  <input type="text" name="narocnik" id="narocnik"
+         value="{{ projekt.narocnik }}">
+
+  <button type="submit" class="btn btn-success">Shrani</button>
+  <a class="btn btn-secondary" href="{{ url_for('seznam_projektov') }}">Prekliči</a>
+</form>
+{% endblock %}

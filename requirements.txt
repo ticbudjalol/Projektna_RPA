@@ -1,0 +1,4 @@
+Flask==2.3.2
+Flask-Login==0.6.2
+Flask-SQLAlchemy==3.0.4
+xhtml2pdf==0.2.12

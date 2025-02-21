@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Uredi Ident: {{ ident.naziv }}</h2>
+<form method="POST">
+  <label for="naziv">Naziv:</label>
+  <input type="text" name="naziv" id="naziv"
+         value="{{ ident.naziv }}" required>
+
+  <label for="merska_enota">Merska enota:</label>
+  <input type="text" name="merska_enota" id="merska_enota"
+         value="{{ ident.merska_enota }}">
+
+  <button type="submit" class="btn btn-success">Shrani</button>
+  <a class="btn btn-secondary" href="{{ url_for('seznam_identov') }}">Prekliči</a>
+</form>
+{% endblock %}

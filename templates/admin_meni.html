@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin meni za podjetje: {{ podjetje.nazivPodjetja }}</h2>
+
+<!-- 1) Obrazec za spremembo imena -->
+<form method="POST">
+  <label for="novo_ime">Spremeni naziv podjetja:</label><br>
+  <input type="text" id="novo_ime" name="novo_ime" value="{{ podjetje.nazivPodjetja }}">
+  <button type="submit" class="btn btn-success">Shrani</button>
+</form>
+
+<hr>
+
+<!-- 2) Obrazec za nalaganje logotipa -->
+<form method="POST" enctype="multipart/form-data">
+  <label for="logo_file">Naloži nov logotip (slika):</label><br>
+  <input type="file" name="logo_file" id="logo_file" accept="image/*">
+  <button type="submit" class="btn btn-info">Naloži</button>
+</form>
+
+<!-- 3) Prikažemo trenutni logotip, če obstaja -->
+{% if podjetje.logo_filename %}
+  <h4>Trenutni Logotip:</h4>
+  <img src="{{ url_for('static', filename='logos/' ~ podjetje.logo_filename) }}" 
+       alt="Logotip" style="max-height: 100px;">
+{% else %}
+  <p>Trenutno logotip ni naložen.</p>
+{% endif %}
+
+<hr>
+
+<h3>Ključ podjetja</h3>
+<p>
+  <input type="text" id="podjetje_key" readonly value="{{ podjetje.kljucPodjetja }}">
+  <button onclick="copyKey()" class="btn btn-secondary">Kopiraj</button>
+</p>
+
+<script>
+function copyKey() {
+  var copyText = document.getElementById("podjetje_key");
+  copyText.select();
+  document.execCommand("copy");
+  alert("Ključ podjetja skopiran: " + copyText.value);
+}
+</script>
+
+{% endblock %}

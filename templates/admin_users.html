@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Uporabniki v Podjetju</h2>
+
+{% if all_users %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Approved?</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in all_users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.role }}</td>
+        <td>{{ 'Da' if u.approved else 'Ne' }}</td>
+        <td>
+          <!-- Obrazec za spreminjanje -->
+          <form action="{{ url_for('update_user_access', user_id=u.id) }}" method="POST" style="display:inline-block;">
+            <label>
+              <input type="checkbox" name="approved" {% if u.approved %}checked{% endif %}>
+              Approved
+            </label>
+            <select name="role">
+              <option value="user" {% if u.role == 'user' %}selected{% endif %}>Uporabnik</option>
+              <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+          </form>
+
+          <!-- Če želiš možnost “brisanja” uporabnika -->
+          <form action="{{ url_for('delete_user', user_id=u.id) }}" method="POST" style="display:inline-block;">
+            <button class="btn btn-sm btn-danger" 
+                    onclick="return confirm('Izbrisati uporabnika {{ u.username }}?')">
+              Izbriši
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Trenutno ni uporabnikov v podjetju.</p>
+{% endif %}
+
+{% endblock %}

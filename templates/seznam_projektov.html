@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Seznam projektov</h2>
+
+{% if projekti %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Naziv projekta</th>
+        <th>Naročnik</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in projekti %}
+      <tr>
+        <td>{{ p.idProjekta }}</td>
+        <td>{{ p.naziv_projekta }}</td>
+        <td>{{ p.narocnik }}</td>
+        <td>
+          <!-- Gumb za Uredi -->
+          <a class="btn btn-sm btn-warning"
+             href="{{ url_for('uredi_projekt', id_proj=p.idProjekta) }}">
+             Uredi
+          </a>
+          <!-- Gumb za Izbriši (uporabimo POST in confirm) -->
+          <form action="{{ url_for('izbrisi_projekt', id_proj=p.idProjekta) }}" 
+                method="POST" style="display:inline;">
+            <button class="btn btn-sm btn-danger"
+                    type="submit"
+                    onclick="return confirm('Res želite izbrisati projekt {{ p.naziv_projekta }}?')">
+              Izbriši
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Trenutno ni projektov.</p>
+{% endif %}
+
+<a class="btn btn-success" href="{{ url_for('dodaj_projekt') }}">Dodaj nov projekt</a>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Neodobreni uporabniki</h2>
+
+{% if pending_users %}
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Username</th><th>Akcije</th></tr>
+    </thead>
+    <tbody>
+    {% for u in pending_users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>
+          <form action="{{ url_for('approve_user', user_id=u.id) }}" method="POST" style="display:inline;">
+            <button class="btn btn-success">Potrdi</button>
+          </form>
+          <form action="{{ url_for('reject_user', user_id=u.id) }}" method="POST" style="display:inline;">
+            <button class="btn btn-danger">Zavrni</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Trenutno ni čakajočih uporabnikov.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Podrobnosti Delovnega Naloga</h2>
+
+<div class="dn-glava">
+  <p><strong>ID:</strong> {{ glava.idGlava_delovnega_naloga }}</p>
+  <p><strong>Naslov:</strong> {{ glava.naslovDN }}</p>
+  <p><strong>Projekt:</strong> {{ glava.projekt.naziv_projekta if glava.projekt else '' }}</p>
+  <p><strong>Naročnik:</strong> {{ glava.projekt.narocnik if glava.projekt else '' }}</p>
+  <p><strong>Status:</strong> {{ glava.status }}</p>
+
+  <hr>
+  <p><strong>Ustvaril:</strong> 
+    {{ glava.created_by.username if glava.created_by else 'Neznan' }} 
+    dne {{ glava.created_at.strftime('%d.%m.%Y %H:%M') if glava.created_at else '' }}
+  </p>
+  <p><strong>Zadnja sprememba:</strong> 
+    {{ glava.updated_by.username if glava.updated_by else 'Neznan' }} 
+    dne {{ glava.updated_at.strftime('%d.%m.%Y %H:%M') if glava.updated_at else '' }}
+  </p>
+</div>
+
+<h3>Postavke</h3>
+{% if glava.postavke and glava.postavke|length > 0 %}
+  <table>
+    <thead>
+      <tr>
+        <th>Ident</th>
+        <th>Količina</th>
+        <th>Ustvaril</th>
+        <th>Zadnja sprememba</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for postavka in glava.postavke %}
+      <tr>
+        <td>{{ postavka.ident.naziv if postavka.ident else '' }}</td>
+        <td>{{ postavka.kolicina }}</td>
+        <td>
+          {{ postavka.created_by.username if postavka.created_by else 'Neznan' }}<br>
+          <small>
+            {{ postavka.created_at.strftime('%d.%m.%Y %H:%M') if postavka.created_at else '' }}
+          </small>
+        </td>
+        <td>
+          {{ postavka.updated_by.username if postavka.updated_by else 'Neznan' }}<br>
+          <small>
+            {{ postavka.updated_at.strftime('%d.%m.%Y %H:%M') if postavka.updated_at else '' }}
+          </small>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Ta delovni nalog še nima postavk.</p>
+{% endif %}
+
+<div class="mt-2">
+  <a class="btn btn-secondary" href="{{ url_for('index') }}">Nazaj</a>
+  <a class="btn btn-success" 
+     href="{{ url_for('dodaj_postavko', id_glave=glava.idGlava_delovnega_naloga) }}">
+     Dodaj postavko
+  </a>
+  <a class="btn" 
+     href="{{ url_for('uredi_status', id_glave=glava.idGlava_delovnega_naloga) }}">
+     Uredi status
+  </a>
+  <a class="btn" 
+  href="{{ url_for('izvoz_pdf', id_glave=glava.idGlava_delovnega_naloga) }}">
+  Izvozi PDF
+</a>
+</div>
+{% endblock %}
