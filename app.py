@@ -15,39 +15,33 @@ from flask import send_file
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///delovni_nalog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'nek_skrivni_kljuc'
+app.config['SECRET_KEY'] = 'test_key'
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'prijava'
 
-# ==========================
-# MODEL: Podjetje
-# ==========================
+
 class Podjetje(db.Model):
     __tablename__ = 'Podjetja'
     idPodjetja = db.Column(db.Integer, primary_key=True)
     nazivPodjetja = db.Column(db.String(100), nullable=False)
     kljucPodjetja = db.Column(db.String(64), unique=True, nullable=False)
 
-    # Dodamo polje za ime datoteke logotipa:
     logo_filename = db.Column(db.String(200), nullable=True)
 
     uporabniki = db.relationship('Uporabnik', backref='podjetje', lazy=True)
 
-# ==========================
-# MODEL: Uporabnik
-# ==========================
 class Uporabnik(UserMixin, db.Model):
     __tablename__ = 'Uporabniki'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), default='user')  # 'admin', 'user', ...
+    role = db.Column(db.String(20), default='user')  
     company_id = db.Column(db.Integer, db.ForeignKey('Podjetja.idPodjetja'), nullable=True)
     approved = db.Column(db.Boolean, default=False)
 
-    # FK na Podjetje
+
     company_id = db.Column(db.Integer, db.ForeignKey('Podjetja.idPodjetja'), nullable=True)
     otp_secret = db.Column(db.String(32), nullable=True)
     two_factor_enabled = db.Column(db.Boolean, default=False)
@@ -62,16 +56,14 @@ class Uporabnik(UserMixin, db.Model):
 def load_user(user_id):
     return Uporabnik.query.get(int(user_id))
 
-# ==========================
-# DODAMO company_id v tabele, ki jih želimo omejiti
-# ==========================
+
 class SeznamProjektov(db.Model):
     __tablename__ = 'SeznamProjektov'
     idProjekta = db.Column(db.Integer, primary_key=True)
     naziv_projekta = db.Column(db.String(45), nullable=False)
     narocnik = db.Column(db.String(45), nullable=True)
 
-    # POMEMBNO: Dodamo FK na Podjetja
+
     company_id = db.Column(db.Integer, db.ForeignKey('Podjetja.idPodjetja'), nullable=True)
 
     glave_nalogov = db.relationship("GlavaDelovnegaNaloga", backref="projekt", lazy=True)
@@ -92,7 +84,7 @@ class GlavaDelovnegaNaloga(db.Model):
 
     seznam_projektov_idProjekta = db.Column(db.Integer, db.ForeignKey('SeznamProjektov.idProjekta'), nullable=False)
 
-    # Dodamo company_id
+
     company_id = db.Column(db.Integer, db.ForeignKey('Podjetja.idPodjetja'), nullable=True)
 
     postavke = db.relationship("PostavkeDelovnegaNaloga", backref="glava_naloga", lazy=True)
@@ -103,7 +95,7 @@ class SeznamIdentov(db.Model):
     naziv = db.Column(db.String(45), nullable=False)
     merska_enota = db.Column(db.String(45), nullable=True)
 
-    # Dodamo company_id
+
     company_id = db.Column(db.Integer, db.ForeignKey('Podjetja.idPodjetja'), nullable=True)
 
     postavke = db.relationship("PostavkeDelovnegaNaloga", backref="ident", lazy=True)
@@ -123,15 +115,12 @@ class PostavkeDelovnegaNaloga(db.Model):
     created_by = db.relationship("Uporabnik", foreign_keys=[created_by_id])
     updated_by = db.relationship("Uporabnik", foreign_keys=[updated_by_id])
 
-    # Tudi postavka spada podjetju
+
     company_id = db.Column(db.Integer, db.ForeignKey('Podjetja.idPodjetja'), nullable=True)
 
 STATUSI = ["V pripravi", "V teku", "Zaključeno", "Preklicano"]
 
 
-# ==========================
-# REGISTRACIJA (navadni user) / PRIJAVA / ODJAVA
-# ==========================
 @app.route('/registracija', methods=['GET', 'POST'])
 def registracija():
     if current_user.is_authenticated:
@@ -146,7 +135,7 @@ def registracija():
             flash('Vnesi uporabniško ime, geslo in ključ podjetja.', 'error')
             return redirect(url_for('registracija'))
 
-        # Poišči podjetje
+
         podjetje = Podjetje.query.filter_by(kljucPodjetja=kljuc_podjetja).first()
         if not podjetje:
             flash('Neveljaven ključ podjetja.', 'error')
@@ -157,7 +146,7 @@ def registracija():
             flash('Uporabniško ime že obstaja. Izberi drugo.', 'error')
             return redirect(url_for('registracija'))
 
-        # Ustvari novega userja
+
         nov = Uporabnik(
             username=uporabnisko_ime,
             role='user',
@@ -185,18 +174,18 @@ def prijava():
 
         user = Uporabnik.query.filter_by(username=uporabnisko_ime).first()
         if user and user.check_password(geslo):
-            # Preverimo, ali je user odobren
+ 
             if not user.approved:
                 flash('Vaš račun še ni odobren.')
                 return redirect(url_for('prijava'))
 
-            # Če ima 2FA vklopljeno, shranimo user.id v session, a ne naredimo login_user
+         
             if user.two_factor_enabled:
                 session['2fa_user_id'] = user.id
                 flash('Vnesite 2FA kodo.')
                 return redirect(url_for('verify_2fa'))
             else:
-                # Ni vklopljena 2FA => takoj login
+          
                 login_user(user)
                 flash('Prijava uspešna.')
                 return redirect(url_for('index'))
@@ -213,14 +202,12 @@ def odjava():
     return redirect(url_for('prijava'))
 
 
-# ==========================
-# POGLAVITNA LOGIKA ZA FILTRIRANJE PODJETJA
-# ==========================
+
 
 @app.route('/')
 @login_required
 def index():
-    # Filtriramo glave NALOGOV po company_id
+
     glave = GlavaDelovnegaNaloga.query.filter_by(company_id=current_user.company_id).all()
     return render_template('domov.html', glave=glave)
 
@@ -233,7 +220,7 @@ def seznam_delovnih_nalogov():
 @app.route('/podrobnosti_delovnega_naloga/<int:id_glave>')
 @login_required
 def podrobnosti_delovnega_naloga(id_glave):
-    # Namesto get_or_404 => .filter_by(...).first_or_404()
+
     glava = GlavaDelovnegaNaloga.query.filter_by(
         idGlava_delovnega_naloga=id_glave,
         company_id=current_user.company_id
@@ -243,13 +230,13 @@ def podrobnosti_delovnega_naloga(id_glave):
 @app.route('/dodaj_delovni_nalog', methods=['GET', 'POST'])
 @login_required
 def dodaj_delovni_nalog():
-    # Najprej filtriramo projekte iz podjetja userja
+
     projekti = SeznamProjektov.query.filter_by(company_id=current_user.company_id).all()
     if request.method == 'POST':
         naslovDN = request.form.get('naslovDN')
         projekt_id = request.form.get('projekt_id')
 
-        # Ustvari nov nalog, doda company_id
+  
         nova_glava = GlavaDelovnegaNaloga(
             naslovDN=naslovDN,
             seznam_projektov_idProjekta=projekt_id,
@@ -265,12 +252,12 @@ def dodaj_delovni_nalog():
 @app.route('/dodaj_postavko/<int:id_glave>', methods=['GET', 'POST'])
 @login_required
 def dodaj_postavko(id_glave):
-    # Preverimo, da glava pripada temu podjetju
+
     glava = GlavaDelovnegaNaloga.query.filter_by(
         idGlava_delovnega_naloga=id_glave,
         company_id=current_user.company_id
     ).first_or_404()
-    # Filtriramo idente z enakim company_id
+
     identi = SeznamIdentov.query.filter_by(company_id=current_user.company_id).all()
     if request.method == 'POST':
         ident_id = request.form.get('ident_id')
@@ -306,13 +293,10 @@ def uredi_status(id_glave):
     return render_template('uredi_status.html', glava=glava, statusi=["V pripravi", "V teku", "Zaključeno", "Preklicano"])
 
 
-# ===============================
-# IZVOZ PDF (XHTML2PDF)
-# ===============================
 @app.route('/izvoz_pdf/<int:id_glave>')
 @login_required
 def izvoz_pdf(id_glave):
-    # Preverimo, da je ta nalog userjevega podjetja
+
     glava = GlavaDelovnegaNaloga.query.filter_by(
         idGlava_delovnega_naloga=id_glave,
         company_id=current_user.company_id
@@ -330,13 +314,11 @@ def izvoz_pdf(id_glave):
     return response
 
 
-# ==========================
-# IDENTI
-# ==========================
+
 @app.route('/seznam_identov')
 @login_required
 def seznam_identov():
-    # Filtriramo identov za podjetje
+
     identi = SeznamIdentov.query.filter_by(company_id=current_user.company_id).all()
     return render_template('seznam_identov.html', identi=identi)
 
@@ -401,9 +383,7 @@ def izbrisi_ident(id_ident):
     return redirect(url_for('seznam_identov'))
 
 
-# ==========================
-# PROJEKTI
-# ==========================
+
 @app.route('/seznam_projektov')
 @login_required
 def seznam_projektov():
@@ -472,7 +452,7 @@ def izbrisi_projekt(id_proj):
 @app.route('/admin_meni', methods=['GET', 'POST'])
 @login_required
 def admin_meni():
-    # Preveri, da je user admin
+   
     if current_user.role != 'admin':
         flash('Dostop zavrnjen. Niste admin.', 'error')
         return redirect(url_for('index'))
@@ -483,9 +463,9 @@ def admin_meni():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        # Preverimo, ali je bil poslan "spremeni naziv" ALI "upload slike"
+ 
         if 'novo_ime' in request.form:
-            # Spremeni ime podjetja
+    
             novo_ime = request.form.get('novo_ime')
             if not novo_ime:
                 flash('Naziv podjetja ne sme biti prazen.', 'error')
@@ -495,17 +475,17 @@ def admin_meni():
             flash('Naziv podjetja uspešno posodobljen.')
             return redirect(url_for('admin_meni'))
 
-        # Druga možnost: naloži logotip
+    
         elif 'logo_file' in request.files:
             logo_file = request.files['logo_file']
             if logo_file:
-                # npr. “company_1.png”
+            
                 filename = f"company_{podjetje.idPodjetja}.png"
-                # Shrani v mapo “static/logos/”
+              
                 save_path = os.path.join(app.static_folder, 'logos', filename)
                 logo_file.save(save_path)
 
-                # Zapišemo v bazo
+            
                 podjetje.logo_filename = filename
                 db.session.commit()
 
@@ -515,14 +495,12 @@ def admin_meni():
 
         return redirect(url_for('admin_meni'))
 
-    # GET zahteva -> prikaži stran
+
     return render_template('admin_meni.html', podjetje=podjetje)
 
 
 
-# ==========================
-# REGISTRIRAJ PODJETJE
-# ==========================
+
 @app.route('/registriraj_podjetje', methods=['GET', 'POST'])
 def registriraj_podjetje():
     if request.method == 'POST':
@@ -543,12 +521,12 @@ def registriraj_podjetje():
         db.session.add(novo_podjetje)
         db.session.flush()
 
-        # Ustvari admin user in takoj approved = True
+     
         admin_user = Uporabnik(
             username=admin_username,
             role='admin',
             company_id=novo_podjetje.idPodjetja,
-            approved=True   # KLJUČNO! Admin je takoj odobren.
+            approved=True   
         )
         admin_user.set_password(admin_password)
         db.session.add(admin_user)
@@ -568,7 +546,7 @@ def admin_requests():
         flash('Dostop zavrnjen. Niste admin.')
         return redirect(url_for('index'))
 
-    # Vsi uporabniki, ki nimajo approved
+
     pending_users = Uporabnik.query.filter_by(approved=False).all()
     return render_template('admin_requests.html', pending_users=pending_users)
 
@@ -595,7 +573,7 @@ def reject_user(user_id):
         return redirect(url_for('index'))
 
     user_to_reject = Uporabnik.query.get_or_404(user_id)
-    # Lahko ga zbrišemo iz baze
+
     db.session.delete(user_to_reject)
     db.session.commit()
     flash('Uporabnik zavrnjen in izbrisan.')
@@ -604,36 +582,36 @@ def reject_user(user_id):
 @app.route('/admin_users')
 @login_required
 def admin_users():
-    # Preverimo, ali je current_user sploh admin
+
     if current_user.role != 'admin':
         flash('Dostop zavrnjen. Niste admin.')
         return redirect(url_for('index'))
 
-    # Pridobimo vse uporabnike v TEM podjetju
+
     all_users = Uporabnik.query.filter_by(company_id=current_user.company_id).all()
     return render_template('admin_users.html', all_users=all_users)
 
 @app.route('/update_user_access/<int:user_id>', methods=['POST'])
 @login_required
 def update_user_access(user_id):
-    # Mora biti admin
+ 
     if current_user.role != 'admin':
         flash('Dostop zavrnjen. Niste admin.')
         return redirect(url_for('index'))
 
     user = Uporabnik.query.get_or_404(user_id)
-    # Preverimo, ali je user iz istega podjetja
+
     if user.company_id != current_user.company_id:
         flash('Ni dovoljenja za urejanje uporabnika iz drugega podjetja.', 'error')
         return redirect(url_for('admin_users'))
 
-    # Preberemo form
-    new_approved = request.form.get('approved')  # bo 'on' ali None
-    new_role = request.form.get('role')          # 'user' ali 'admin'
 
-    # Nastavimo
+    new_approved = request.form.get('approved')  
+    new_role = request.form.get('role')          
+
+
     user.approved = True if new_approved == 'on' else False
-    user.role = new_role  # Lahko preveriš ali je 'user' ali 'admin'
+    user.role = new_role  
 
     db.session.commit()
     flash(f'Uporabnik {user.username} posodobljen (approved={user.approved}, role={user.role}).')
@@ -651,7 +629,7 @@ def delete_user(user_id):
         flash('Ni dovoljenja za brisanje tujega uporabnika.', 'error')
         return redirect(url_for('admin_users'))
 
-    # Lahko preveriš, da admin ne izbriše samega sebe :)
+
     if user.id == current_user.id:
         flash('Ne morete izbrisati samega sebe!', 'error')
         return redirect(url_for('admin_users'))
@@ -667,16 +645,15 @@ def setup_2fa():
     user = current_user
 
     if request.method == 'POST':
-        # 1) Ustvari random secret, če je še ni
+       
         if not user.otp_secret:
             user.otp_secret = pyotp.random_base32()
             db.session.commit()
 
-        # 2) TOTP URI => otpauth://totp/<APLIKACIJA>?secret=...
-        #   Ime "MojaAplikacija:{username}" => pojavi se v Google Auth.
+   
         totp_uri = f"otpauth://totp/MojaAplikacija:{user.username}?secret={user.otp_secret}&issuer=MojaAplikacija"
 
-        # 3) Generiraj QR kodo (PNG)
+    
         qr_img = qrcode.make(totp_uri)
         buf = io.BytesIO()
         qr_img.save(buf, 'PNG')
@@ -684,11 +661,11 @@ def setup_2fa():
 
         return send_file(buf, mimetype='image/png')
 
-    # GET => prikaži stran z gumbom “Ustvari QR kodo”
+  
     return render_template('setup_2fa.html')
 
 def verify_2fa():
-    # Najprej preverimo, ali session['2fa_user_id'] obstaja
+  
     user_id = session.get('2fa_user_id')
     if not user_id:
         flash('Nimate aktivne 2FA seje. Najprej se prijavite.')
@@ -703,9 +680,9 @@ def verify_2fa():
         code = request.form.get('code')
         totp = pyotp.TOTP(user.otp_secret)
         if totp.verify(code):
-            # 2FA uspešna => login_user
+       
             login_user(user)
-            # Po uspehu pobrišemo session['2fa_user_id'], da ne ostane
+         
             session.pop('2fa_user_id', None)
             flash('2FA uspešna, dobrodošli!')
             return redirect(url_for('index'))
@@ -740,7 +717,7 @@ def enable_2fa():
 
 @app.route('/verify_2fa', methods=['GET', 'POST'])
 def verify_2fa():
-    # Najprej preverimo, ali session['2fa_user_id'] obstaja
+
     user_id = session.get('2fa_user_id')
     if not user_id:
         flash('Nimate aktivne 2FA seje. Najprej se prijavite.')
@@ -755,9 +732,9 @@ def verify_2fa():
         code = request.form.get('code')
         totp = pyotp.TOTP(user.otp_secret)
         if totp.verify(code):
-            # 2FA uspešna => login_user
+         
             login_user(user)
-            # Po uspehu pobrišemo session['2fa_user_id'], da ne ostane
+       
             session.pop('2fa_user_id', None)
             flash('2FA uspešna, dobrodošli!')
             return redirect(url_for('index'))
@@ -779,9 +756,7 @@ def disable_2fa():
 
 
 
-# ==========================
-# GLAVNI ZAGON
-# ==========================
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
